@@ -1,46 +1,43 @@
-
 (function(){
   var html = document.documentElement;
-  var mode = html.getAttribute('data-ga-mode') || 'gtag'; // 'gtag' or 'gtm'
-  var gaId = html.getAttribute('data-ga-id') || '';
+  var mode = html.getAttribute('data-ga-mode') || 'gtm';
   var gtmId = html.getAttribute('data-gtm-id') || '';
   var payload = (window.__cf_err) || {};
-  var pagePath = '/cf-error/' + (payload.code || 'unknown');
-  var eventName = 'cf_error_' + (payload.code || 'unknown');
+  var code = (payload.code || 'unknown');
+  var pagePath = '/friendly_errors/' + code;
+  var pageTitle = 'friendly_errors ' + code;
+  var eventName = 'cf_error_' + code;
 
-  function inject(src, isModule){
-    var s = document.createElement('script');
-    s.async = true;
-    s.src = src;
-    if(isModule) s.type='module';
-    document.head.appendChild(s);
-  }
+  // Always prepare the dataLayer first
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    'event': 'page_view',
+    'page_path': pagePath,
+    'page_location': pagePath,  // GA4 event tag can map this to page_location or use a field override
+    'page_title': pageTitle,
+    'cf_error_code': payload.code,
+    'cf_error_key': payload.key,
+    'cf_error_ref': payload.ref
+  });
 
-  if(mode === 'gtag' && gaId){
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    inject('https://www.googletagmanager.com/gtag/js?id=' + gaId);
-    gtag('js', new Date());
-    gtag('config', gaId, { 'page_path': pagePath });
-    gtag('event', eventName, {
-      'error_code': payload.code,
-      'error_key': payload.key,
-      'ref': payload.ref
-    });
-  } else if(mode === 'gtm' && gtmId){
-    window.dataLayer = window.dataLayer || [];
-    dataLayer.push({
-      'event': eventName,
-      'cf_error_code': payload.code,
-      'cf_error_key': payload.key,
-      'cf_error_ref': payload.ref,
-      'page_path': pagePath
-    });
-    (function(w,d,s,l,i){ w[l]=w[l]||[]; w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+  // Also push a specific error event for extra tagging/alerts
+  window.dataLayer.push({
+    'event': eventName,
+    'cf_error_code': payload.code,
+    'cf_error_key': payload.key,
+    'cf_error_ref': payload.ref,
+    'page_path': pagePath
+  });
+
+  // Load GTM if requested
+  if(mode === 'gtm' && gtmId){
+    (function(w,d,s,l,i){ 
+      w[l]=w[l]||[]; 
+      w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
       var f=d.getElementsByTagName(s)[0], j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
-      j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl; f.parentNode.insertBefore(j,f);
+      j.async=true; 
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl; 
+      f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer', gtmId);
-  } else {
-    // no tracking
   }
 })();
