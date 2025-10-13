@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" data-error-code="500" data-error-key="500-generic" data-error-title="Server error (5xx)" data-ga-mode="gtag" data-ga-id="G-XXXXXXX" data-gtm-id="GTM-XXXXXXX">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Server error (5xx) • Radio‑Controlled.co.uk</title>
+  <title>Server error (5xx) • Radio-Controlled.co.uk</title>
   <link rel="preload" href="../assets/styles.css" as="style">
   <link rel="stylesheet" href="../assets/styles.css">
   <meta name="robots" content="noindex, nofollow">
@@ -11,34 +11,34 @@
 <body>
   <main class="card">
     <div class="header">
-      <img src="../assets/logo.png" alt="Radio‑Controlled.co.uk logo" />
+      <img src="../assets/logo.png" alt="Radio-Controlled.co.uk logo" />
       <span class="badge">500</span>
     </div>
+
     <h1>Server error (5xx)</h1>
     <p>Something went wrong between our site and the server. This is on us – not you. Our team will investigate immediately.</p>
+
     <div class="actions">
       <a class="button" href="https://radio-controlled.co.uk/">Go to homepage</a>
       <a class="button secondary" href="https://radio-controlled.co.uk/contact-us/">Contact support</a>
       <button class="button secondary" onclick="location.reload()">Try again</button>
     </div>
+
     <div class="footer">
       <span class="small">Ref: <span class="code" id="ref"></span></span>
       <span class="small">Error code: <span class="code">500</span></span>
     </div>
+
+    <!-- Cloudflare required token for 5xx -->
+    <div id="cf-error-details" style="display:none">::CLOUDFLARE_ERROR_500S_BOX::</div>
   </main>
+
   <script>
-    // Add a tiny request fingerprint to help correlate incidents (no PII)
-    (function() {
+    (function(){
       var t = new Date();
       var ref = (t.toISOString() + '|' + (Math.random().toString(36).slice(2,8)));
       document.getElementById('ref').textContent = ref;
-      window.__cf_err = {
-        code: "500",
-        key: "500-generic",
-        title: "Server error (5xx)",
-        ref: ref,
-        ts: t.toISOString()
-      };
+      window.__cf_err = { code: "500", key: "500-generic", title: "Server error (5xx)", ref: ref, ts: t.toISOString() };
     })();
   </script>
   <script src="../assets/tracking.js"></script>
