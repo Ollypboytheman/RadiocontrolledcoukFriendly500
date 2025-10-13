@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-error-code="526" data-error-key="526-invalid-ssl-cert" data-error-title="Invalid SSL certificate" data-ga-mode="gtag" data-ga-id="G-XXXXXXX" data-gtm-id="GTM-XXXXXXX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invalid SSL certificate • Radio‑Controlled.co.uk</title>
+  <link rel="preload" href="../assets/styles.css" as="style">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+  <main class="card">
+    <div class="header">
+      <img src="../assets/logo.png" alt="Radio‑Controlled.co.uk logo" />
+      <span class="badge">526</span>
+    </div>
+    <h1>Invalid SSL certificate</h1>
+    <p>The origin SSL/TLS certificate is invalid or untrusted.</p>
+    <div class="actions">
+      <a class="button" href="https://radio-controlled.co.uk/">Go to homepage</a>
+      <a class="button secondary" href="https://radio-controlled.co.uk/contact-us/">Contact support</a>
+      <button class="button secondary" onclick="location.reload()">Try again</button>
+    </div>
+    <div class="footer">
+      <span class="small">Ref: <span class="code" id="ref"></span></span>
+      <span class="small">Error code: <span class="code">526</span></span>
+    </div>
+  </main>
+  <script>
+    // Add a tiny request fingerprint to help correlate incidents (no PII)
+    (function() {
+      var t = new Date();
+      var ref = (t.toISOString() + '|' + (Math.random().toString(36).slice(2,8)));
+      document.getElementById('ref').textContent = ref;
+      window.__cf_err = {
+        code: "526",
+        key: "526-invalid-ssl-cert",
+        title: "Invalid SSL certificate",
+        ref: ref,
+        ts: t.toISOString()
+      };
+    })();
+  </script>
+  <script src="../assets/tracking.js"></script>
+</body>
+</html>
