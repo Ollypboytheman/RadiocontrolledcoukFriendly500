@@ -56,7 +56,7 @@ Proposed structure:
   the annotation moves anything).
 - **Benefit 1 — Member delivery:** free UK standard delivery for members over **£49** (vs £129.99 for
   everyone else). This is the strongest lever we have and costs nothing on orders we'd otherwise lose.
-- **Benefit 2 — Points:** 1 point per £1, 100 points = £5 off. Renders on every eligible SKU in the
+- **Benefit 2 — Points:** 100 points = £1, tiered earn rate by category (full design in Appendix A). Renders on every eligible SKU in the
   feed, so it annotates the whole catalogue without touching a single price.
 - **Benefit 3 — Member price:** pilot set only (see §4), never catalogue-wide.
 
@@ -179,6 +179,128 @@ Keep it, and wire it into RC Club instead of running it alongside:
 - Do we have an existing points/rewards system, or does RC Club start from zero?
 - Margin floor per category, to pick the pilot SKU set.
 - Who owns the Customer Match sync and its refresh cadence.
+
+## Appendix A — "RC Points": the points programme design
+
+Points are the benefit that annotates the **whole catalogue** at near-zero unit-margin cost, so this
+is the piece to get right first. Design below is the recommended format.
+
+### A1. The currency: 100 points = £1
+
+One point = one penny. State the conversion on the join page, the PDP, the basket and the account
+page, every time points are mentioned.
+
+Do **not** inflate the currency (e.g. "500 points = £1") to make the numbers in the Google annotation
+look bigger. It works for airlines and supermarkets because nobody audits them; RC buyers are
+researchers who compare on forums and Facebook groups, and an opaque conversion reads as a gimmick in
+a community that talks to itself. Legibility is worth more than a bigger number in the ad.
+
+> If we later decide the annotation number matters more than the clarity, the display-optimised
+> variant is 10 points per £1 at 500 points = £1 — same 2% return, 5× the number on screen. Test it,
+> don't assume it.
+
+### A2. Earn rates — the margin control and the ad lever in one
+
+`loyalty_points` is submitted **per item**, so the earn rate can vary by product and the bigger point
+numbers show up in the ads for exactly the products we want clicked.
+
+| Product group | Rate | Rationale |
+|---|---|---|
+| Spares, hop-ups, tyres, batteries, chargers, servos, tools, paint, own-brand | **4 pts/£1 (4%)** | Best margin, highest repeat frequency. This is the habit-forming category — the £25 part shows "100 points" in the ad |
+| Standard catalogue — RTR kits, cars, trucks, drones, branded hardware | **2 pts/£1 (2%)** | Thin distributor margin on ARRMA/Kyosho/Tamiya/Team Associated; 2% of a £450 truck is already £9 |
+| Clearance / sale items | **1 pt/£1** | Margin already given away once |
+| Gift cards, delivery charges | **Excluded** | Omit the attribute entirely — never submit `0` |
+
+Blended cost lands around 2.2–2.6% of eligible sales depending on mix. Model the liability at full
+issue and the P&L cost at redemption (see A6).
+
+### A3. Non-purchase earns — where the programme gets cheap and sticky
+
+These cost far less than margin points and do most of the retention work:
+
+| Action | Points | Why |
+|---|---|---|
+| Create account / join | 100 (£1) | Locks in the sign-up; redeemable only after the first paid order |
+| Product review | 50 | Review volume is worth more than 50p to us |
+| Review with a photo or build shot | 150 | UGC for PDPs, social and Google product reviews |
+| Newsletter + SMS opt-in | 50 each | Owned channels, one-off cost |
+| Birthday | 100 | Cheap reactivation trigger |
+| **Referral — referrer** | **500 (£5)** on the referee's first order over £30 | The existing refer-a-friend, folded in |
+| **Referral — referee** | **250 (£2.50)** off the first order | Converts the introduction |
+
+That last pair is how refer-a-friend survives: same mechanic, one ledger, and it now feeds the
+membership that Google can actually annotate.
+
+### A4. Redemption
+
+- **From 250 points (£2.50), in 250-point blocks.** The rule that matters: a typical customer should
+  reach their first reward inside 2–3 average orders. With the 100-point joining bonus and a review,
+  order two gets there. Thresholds that need 10+ orders are where programmes die.
+- Applied at checkout as a discount on the **goods total, excluding delivery**.
+- No points earned on the portion of an order paid with points.
+- Stacks with sale prices — refusing to stack creates support tickets worth more than the margin saved.
+- Target redemption rate **above 50%**. Below that, points aren't driving behaviour, they're just an
+  accrued liability with a marketing story attached.
+
+### A5. The rules that protect us
+
+- Points award **on dispatch**, not on order placement.
+- Refund or return claws the points back; if already spent, the refund is net of the points value used.
+- **12-month rolling expiry from last account activity** (any order, earn or redemption resets it).
+  Rolling, not fixed — fixed expiry punishes the seasonal buyer who orders every spring.
+- Non-transferable, no cash value, not valid on gift cards.
+- Trade/bulk accounts excluded, or capped, so the programme isn't subsidising resellers.
+- One account per person; points forfeited on account closure or abuse.
+
+### A6. What it costs — worked example per £100k of eligible sales
+
+| | |
+|---|---|
+| Points issued at ~2.4% blended | £2,400 |
+| Redeemed at 55% | £1,320 |
+| Breakage (expired/unredeemed) | £1,080 — never hits the P&L, but sits as liability until it expires |
+| **Real cost of sales** | **~1.3%** |
+
+Two notes for the accountant: outstanding points are a deferred-revenue "material right" under IFRS 15
+and should be provisioned, not ignored; and when points are applied as a discount, VAT follows the
+reduced consideration.
+
+### A7. Tiers — not at launch
+
+Launch with a single tier (`Member`) to keep the feed simple and get the annotation live. At ~90 days,
+if members are outspending non-members, add one tier on 12-month rolling spend:
+
+- **Member** — 2 pts/£1 base, free delivery over £49
+- **Pit Crew** (£750+ / 12 months) — 3 pts/£1 base, free delivery with no threshold, early access to
+  restocks and new releases
+
+Each tier is a separate `loyalty_program` group in the feed with its own `tier_label`, so tier-specific
+points can be annotated. Two tiers is the practical ceiling before the feed and the customer
+explanation both get expensive.
+
+### A8. Feed mapping
+
+```
+loyalty_program:
+  program_label:  RC Club          # case-sensitive, must match Merchant Center exactly
+  tier_label:     Member           # ditto
+  loyalty_points: 100              # whole numbers only, per item, per tier
+  shipping_label: member_free_49   # member delivery benefit
+  price:          — pilot SKUs only
+```
+
+Rounding: compute points from the item price and **round down** to a whole number. Rounding up on
+every SKU in a 12,000-line catalogue is free money given away for no display benefit.
+
+### A9. Naming
+
+Programme: **RC Club**. Currency: **RC Points**, or plain "points".
+
+RC-native currency names (Amps, Volts, Nitro) are tempting and on-brand, but every one of them adds a
+translation step between the number on screen and the pounds in the customer's head. If we want the
+brand flourish, put it in the tier names (Pit Crew, Podium), not in the currency.
+
+---
 
 ## Sources
 
